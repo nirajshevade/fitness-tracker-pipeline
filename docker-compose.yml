@@ -20,7 +20,7 @@ services:
       retries: 3
       start_period: 10s
 
-  # Jenkins Server (Optional - for local CI/CD testing)
+  # Jenkins Server 
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins-server
