@@ -216,7 +216,16 @@ pipeline {
         // Stage 11: Deploy to Production (Manual Approval)
         stage('Deploy to Production') {
             when {
-                branch 'main'
+                anyof {
+                    branch 'main'
+                    branch 'origin/main'
+                    expression {
+                        return env.GIT_BRANCH == 'main' ||
+                        env.GIT_BRANCH == 'origin/main' ||
+                        env.BRANCH_NAME == 'main'
+                    }
+                }
+                
             }
             steps {
                 // Manual approval gate
