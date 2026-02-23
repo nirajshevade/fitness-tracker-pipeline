@@ -221,8 +221,8 @@ pipeline {
                     branch 'origin/main'
                     expression {
                         return env.GIT_BRANCH == 'main' ||
-                        env.GIT_BRANCH == 'origin/main' ||
-                        env.BRANCH_NAME == 'main'
+                            env.GIT_BRANCH == 'origin/main' ||
+                            env.BRANCH_NAME == 'main'
                     }
                 }
                 
