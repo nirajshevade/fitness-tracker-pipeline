@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitness Tracker - CI/CD Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            color: white;
+        }
+
+        .stat-item .number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .stat-item .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .workout-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .workout-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+
+        .workout-item:hover {
+            transform: translateX(5px);
+        }
+
+        .workout-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .workout-info p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .workout-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
+        .delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #ff3344;
+        }
+
+        .goals-form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .goal-item {
+            text-align: center;
+        }
+
+        .goal-item input {
+            width: 100%;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 30px;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        .ci-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏃‍♂️ Fitness Tracker</h1>
+            <p>Track your workouts, set goals, and achieve your fitness dreams!</p>
+            <div class="ci-badge">CI/CD Powered by Jenkins</div>
+        </header>
+
+        <div class="dashboard">
+            <!-- Statistics Card -->
+            <div class="card">
+                <h2>📊 Your Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="number" id="totalWorkouts">0</div>
+                        <div class="label">Workouts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="totalCalories">0</div>
+                        <div class="label">Calories</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number" id="totalSteps">0</div>
+                        <div class="label">Steps</div>
+                    </div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <p style="color: #666; margin-bottom: 5px;">Weekly Goal Progress</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Workout Card -->
+            <div class="card">
+                <h2>➕ Log Workout</h2>
+                <form id="workoutForm">
+                    <div class="form-group">
+                        <label for="workoutType">Workout Type</label>
+                        <select id="workoutType" required>
+                            <option value="">Select type...</option>
+                            <option value="Running">🏃 Running</option>
+                            <option value="Cycling">🚴 Cycling</option>
+                            <option value="Swimming">🏊 Swimming</option>
+                            <option value="Weight Training">🏋️ Weight Training</option>
+                            <option value="Yoga">🧘 Yoga</option>
+                            <option value="Walking">🚶 Walking</option>
+                            <option value="HIIT">💪 HIIT</option>
+                            <option value="Other">⚡ Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration (minutes)</label>
+                        <input type="number" id="duration" min="1" max="300" required placeholder="e.g., 30">
+                    </div>
+                    <div class="form-group">
+                        <label for="calories">Calories Burned</label>
+                        <input type="number" id="calories" min="0" placeholder="e.g., 250">
+                    </div>
+                    <div class="form-group">
+                        <label for="steps">Steps (if applicable)</label>
+                        <input type="number" id="steps" min="0" placeholder="e.g., 5000">
+                    </div>
+                    <button type="submit" class="btn">Log Workout</button>
+                </form>
+            </div>
+
+            <!-- Goals Card -->
+            <div class="card">
+                <h2>🎯 Your Goals</h2>
+                <form id="goalsForm">
+                    <div class="goals-form">
+                        <div class="goal-item">
+                            <label>Daily Steps</label>
+                            <input type="number" id="goalSteps" value="10000">
+                        </div>
+                        <div class="goal-item">
+                            <label>Daily Calories</label>
+                            <input type="number" id="goalCalories" value="500">
+                        </div>
+                        <div class="goal-item">
+                            <label>Weekly Workouts</label>
+                            <input type="number" id="goalWorkouts" value="5">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn" style="margin-top: 15px;">Update Goals</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Workout History -->
+        <div class="card">
+            <h2>📋 Workout History</h2>
+            <div class="workout-list" id="workoutList">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <p>No workouts logged yet. Start your fitness journey!</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Fitness Tracker v1.0.0 | DevOps CI/CD Demonstration</p>
+            <p>Built with Node.js, Express & Jenkins Pipeline</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_BASE = '';
+
+        // Load initial data
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFitnessData();
+        });
+
+        // Load all fitness data
+        async function loadFitnessData() {
+            try {
+                const response = await fetch(`${API_BASE}/api/fitness`);
+                const data = await response.json();
+                
+                updateStats(data.stats);
+                updateGoals(data.goals);
+                displayWorkouts(data.workouts);
+                updateProgress(data.stats, data.goals);
+            } catch (error) {
+                console.error('Error loading fitness data:', error);
+            }
+        }
+
+        // Update statistics display
+        function updateStats(stats) {
+            document.getElementById('totalWorkouts').textContent = stats.totalWorkouts;
+            document.getElementById('totalCalories').textContent = stats.totalCaloriesBurned;
+            document.getElementById('totalSteps').textContent = stats.totalSteps.toLocaleString();
+        }
+
+        // Update goals form
+        function updateGoals(goals) {
+            document.getElementById('goalSteps').value = goals.dailySteps;
+            document.getElementById('goalCalories').value = goals.dailyCalories;
+            document.getElementById('goalWorkouts').value = goals.weeklyWorkouts;
+        }
+
+        // Update progress bar
+        function updateProgress(stats, goals) {
+            const progress = Math.min((stats.totalWorkouts / goals.weeklyWorkouts) * 100, 100);
+            document.getElementById('progressFill').style.width = `${progress}%`;
+        }
+
+        // Display workouts list
+        function displayWorkouts(workouts) {
+            const container = document.getElementById('workoutList');
+            
+            if (workouts.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <p>No workouts logged yet. Start your fitness journey!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = workouts.map(workout => `
+                <div class="workout-item">
+                    <div class="workout-info">
+                        <h3>${getWorkoutEmoji(workout.type)} ${workout.type}</h3>
+                        <div class="workout-meta">
+                            <span>⏱️ ${workout.duration} min</span>
+                            <span>🔥 ${workout.caloriesBurned} cal</span>
+                            ${workout.steps ? `<span>👟 ${workout.steps.toLocaleString()} steps</span>` : ''}
+                            <span>📅 ${workout.date}</span>
+                        </div>
+                    </div>
+                    <button class="delete-btn" onclick="deleteWorkout(${workout.id})">Delete</button>
+                </div>
+            `).reverse().join('');
+        }
+
+        // Get emoji for workout type
+        function getWorkoutEmoji(type) {
+            const emojis = {
+                'Running': '🏃',
+                'Cycling': '🚴',
+                'Swimming': '🏊',
+                'Weight Training': '🏋️',
+                'Yoga': '🧘',
+                'Walking': '🚶',
+                'HIIT': '💪',
+                'Other': '⚡'
+            };
+            return emojis[type] || '⚡';
+        }
+
+        // Handle workout form submission
+        document.getElementById('workoutForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const workout = {
+                type: document.getElementById('workoutType').value,
+                duration: document.getElementById('duration').value,
+                caloriesBurned: document.getElementById('calories').value || 0,
+                steps: document.getElementById('steps').value || 0,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/workouts`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(workout)
+                });
+
+                if (response.ok) {
+                    loadFitnessData();
+                    e.target.reset();
+                }
+            } catch (error) {
+                console.error('Error adding workout:', error);
+            }
+        });
+
+        // Handle goals form submission
+        document.getElementById('goalsForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const goals = {
+                dailySteps: document.getElementById('goalSteps').value,
+                dailyCalories: document.getElementById('goalCalories').value,
+                weeklyWorkouts: document.getElementById('goalWorkouts').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/goals`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(goals)
+                });
+
+                if (response.ok) {
+                    loadFitnessData();
+                    alert('Goals updated successfully!');
+                }
+            } catch (error) {
+                console.error('Error updating goals:', error);
+            }
+        });
+
+        // Delete workout
+        async function deleteWorkout(id) {
+            if (!confirm('Are you sure you want to delete this workout?')) return;
+
+            try {
+                const response = await fetch(`${API_BASE}/api/workouts/${id}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadFitnessData();
+                }
+            } catch (error) {
+                console.error('Error deleting workout:', error);
+            }
+        }
+    </script>
+</body>
+</html>
