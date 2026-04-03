@@ -331,7 +331,7 @@ The implementation showcases DevOps best practices including:
 ## Author
 
 DevOps Lab - Experiment 4
-Continuous Integration and Continuous Deployment using Jenkins
+Continuous Integration and Continuous Deployment using Jenkins.
 
 ---
 
